@@ -1,223 +1,329 @@
-local ui = loadstring(game:HttpGet("https://raw.githubusercontent.com/Kinlei/MaterialLua/master/Module.lua"))()
+wait()
 
-local window = ui.Load({
+		local isGingerbreadExist = false
 
-	Title = "🇨🇵 Francês N$ 🇨🇵",	Style = 3,
+		if not isGingerbreadExist then
 
-	SizeX = 300,
+		
 
-	SizeY = 300,
+			local G = getgenv()
 
-	Theme = "Dark",
+			G.config = {
 
-	ColorOverrides = {
+				placeId = 8737899170,
 
-		MainFrame = Color3.fromRGB(10, 10, 10),
+				eventName = "Gingerbread", -- prob to change it to Comet or Coin Jar
 
-		NavBar = Color3.fromRGB(24, 24, 24),
+				servers = {
 
-		TitleBar = Color3.fromRGB(22, 22, 22),
+					count = 100, -- 10, 25, 50, 100
 
-		Content = Color3.fromRGB(50, 50, 50),
+					sort = "Desc", -- Desc, Asc
 
-	},
+					pageDeep = math.random(2, 6), -- selected players page
 
-})
+				},
 
-local Client = game.Players.LocalPlayer
+				delays = {
 
-local RS = game.ReplicatedStorage
+					beforeExecute = 0.3,
 
-local Notifications = Client.PlayerGui.ScreenGui.Notifications
+					beforeBreak = 1.5,
 
-local Network = require(game.ReplicatedStorage.Modules.Utils.Network)
+					afterBreak = 2.4,
 
-local Settings = {
+					hit = 0.03,
 
-	AutoClick = false,
+					lootbag = 0.03,
 
-	AutoHatch = false,
+					beforeTp = 2,
 
-	SelectedEgg = "Forest Egg",
+					whileError = 10,
 
-	AutoEquip = false,
+				},
 
-	AutoRebirth = false,
+			}
 
-	SelectedRebirth = 11,
 
-}
 
-local Util = {}
+			if not G.config then
 
-do
+				G.config = {
 
-	function Util.SetSetting(setting, value)
+					placeId = 8737899170,
 
-		Settings[setting] = value
+					eventName = "Gingerbread",
 
-	end
+					servers = {
 
-	function Util.GetEggs()
+						count = 100,  -- 10, 25, 50, 100
 
-		local EggTable = {}
+						sort = "Asc", -- Desc, Asc
 
-		for _, v in next, workspace.GameAssets.Capsules:GetChildren() do
+						pageDeep = math.random(2, 6), -- selected players page
 
-			table.insert(EggTable, v.Name)
+					},
 
-		end
+					delays = {
 
-		return EggTable
+						beforeExecute = 0.3,
 
-	end
+						beforeBreak = 1.5,
 
-end
+						afterBreak = 2.4,
 
-local Functions = {}
+						hit = 0.03,
 
-do
+						lootbag = 0.03,
 
-	function Functions.Click()
+						beforeTp = 2,
 
-		while true do
+						whileError = 10,
 
-			task.wait()
+					},
 
-			if Settings.AutoClick then
-
-				Network:FireServer("ClickDetect")
+				}
 
 			end
 
-		end
 
-	end
 
-	function Functions.Hatch()
+			repeat
 
-		while true do
+				task.wait()
 
-			task.wait()
+			until game.PlaceId ~= nil
 
-			if Settings.AutoHatch then
 
-				Network:FireServer("OpenCapsules", Settings.SelectedEgg, 3)
 
-			end
+			if not game:IsLoaded() then
 
-		end
-
-	end
-
-	function Functions.Rebirth()
-
-		while true do
-
-			task.wait()
-
-			if Settings.AutoRebirth then
-
-				Network:FireServer("Rebirth", Settings.SelectedRebirth)
+				game.Loaded:Wait()
 
 			end
 
-		end
+
+
+			local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+			local HttpService = game:GetService("HttpService")
+
+			local Players = game:GetService("Players")
+
+			local TeleportService = game:GetService("TeleportService")
+
+
+
+			task.wait(G.config.delays.beforeExecute)
+
+
+
+			if game.PlaceId ~= G.config.placeId then
+
+				print("Gingerbread hunter unloaded, unknown place.")
+
+				return
+
+			end
+
+
+
+			local Library = require(ReplicatedStorage:WaitForChild("Library", 2000))
+
+
+
+			if not Library.Loaded then
+
+				repeat
+
+					task.wait()
+
+				until Library.Loaded ~= false
+
+			end
+
+
+
+			local RandomEventCmds = Library.RandomEventCmds
+
+			local LocalPlayer = Players.LocalPlayer
+
+			local Character = LocalPlayer.Character
+
+			local Humanoid = Character:WaitForChild("Humanoid", 1000)
+
+			local HumanoidRootPart = Character:WaitForChild("HumanoidRootPart", 1000)
+
+
+
+			print(HttpService:JSONEncode(G.config))
+
+
+
+			function tpToPos(cframe)
+
+				HumanoidRootPart.CFrame = CFrame.new(cframe)
+
+			end
+
+
+
+
+
+			local activeEvents = RandomEventCmds.GetActive() or RandomEventCmds.GetActive()
+
+		
+
+			task.wait(G.config.delays.beforeExecute)
+
+
+
+			for eventId, event in activeEvents do
+
+				if event.name == G.config.eventName then
+
+					isGingerbreadExist = true
+
+					tpToPos(event.origin + Vector3.new(0, 18, 0))
+
+				end
+
+			end
+
+
+
+			Library.Things:FindFirstChild("Lootbags").ChildAdded:Connect(function(lootbag)
+
+				task.wait()
+
+				if lootbag then
+
+					game:GetService("ReplicatedStorage"):WaitForChild("Network"):WaitForChild("Lootbags_Claim"):FireServer(unpack({ [1] = { [1] = lootbag.Name, }, }))
+
+				end
+
+			end)
+
+
+
+			function CollectAllLootbags()
+
+				pcall(function()
+
+					for _, lootbag in pairs(Library.Things:FindFirstChild("Lootbags"):GetChildren()) do
+
+						if lootbag and not lootbag:GetAttribute("Collected") then
+
+							game:GetService("ReplicatedStorage")
+
+								:WaitForChild("Network")
+
+								:WaitForChild("Lootbags_Claim")
+
+								:FireServer(unpack({ [1] = { [1] = lootbag.Name, }, }))
+
+							task.wait(G.config.delays.lootbag)
+
+						end
+
+					end
+
+				end)
+
+			end
+
+
+
+			function findGingerbread()
+
+				for index, breakable in Library.Things.Breakables:GetChildren() do
+
+					if breakable.ClassName == "Model" and breakable:GetAttribute("BreakableID") == G.config.eventName then
+
+						return breakable
+
+					end
+
+				end
+
+			end
+
+
+
+			if isGingerbreadExist then
+
+				Library.Alert.Message("Gingerbread exist!")
+
+				task.wait(G.config.delays.beforeBreak)
+
+				local findedGingerbread = nil
+
+
+
+				for i = 1, 5, 1 do
+
+					findedGingerbread = findGingerbread()
+
+
+
+					if findedGingerbread then
+
+						tpToPos(findedGingerbread.PrimaryPart.Position + Vector3.new(0, 18, 0))
+
+						break
+
+					else
+
+						task.wait(0.5)
+
+					end
+
+				end
+
+
+
+				if findedGingerbread then
+
+					Library.Alert.Message("Start breaking!")
+
+
+
+					while Library.Things.Breakables:FindFirstChild(findedGingerbread.Name) do
+
+						local args = { [1] = findedGingerbread.Name, }
+
+						game:GetService("ReplicatedStorage")
+
+							:WaitForChild("Network")
+
+							:WaitForChild("Breakables_PlayerDealDamage")
+
+							:FireServer(unpack(args))
+
+						task.wait(G.config.delays.hit)
+
+					end
+
+
+
+					Library.Alert.Message("Broke!")
+
+					findedGingerbread = false
+
+				end
+
+
+
+				CollectAllLootbags()
+
+				task.wait(G.config.delays.afterBreak)
+
+				CollectAllLootbags()
+
+				task.wait(G.config.delays.afterBreak)
+
+
+
+			end
 
 	end
-
-end
-
-local Tabs = {}
-
-Tabs.Autofarm = window.New({ Title = "Autofarm" })
-
-do
-
-	Tabs.Autofarm.Toggle({
-
-		Text = "Auto Click",
-
-		Callback = function(Value)
-
-			Util.SetSetting("AutoClick", Value)
-
-		end,
-
-	})
-
-	Tabs.Autofarm.Toggle({
-
-		Text = "Auto Eggs",
-
-		Callback = function(Value)
-
-			Util.SetSetting("AutoHatch", Value)
-
-		end,
-
-	})
-
-	Tabs.Autofarm.Dropdown({
-
-		Text = "Select Egg",
-
-		Options = Util.GetEggs(),
-
-		Callback = function(Value)
-
-			Util.SetSetting("SelectedEgg", Value)
-
-		end,
-
-	})
-
-	Tabs.Autofarm.Toggle({
-
-		Text = "Auto Rebirth",
-
-		Callback = function(Value)
-
-			Util.SetSetting("AutoRebirth", Value)
-
-		end,
-
-	})
-
-	Tabs.Autofarm.TextField({
-
-		Text = "Rebirth Amount",
-
-		Callback = function(Value)
-
-			Util.SetSetting("SelectedRebirth", tonumber(Value))
-
-		end,
-
-	})
-
-	Tabs.Autofarm.Toggle({
-
-		Text = "Hide Notifications",
-
-		Callback = function(Value)
-
-			Notifications.Visible = not Value
-
-		end,
-
-	})
-
-	Tabs.Autofarm.Label({
-
-		Text = "🇨🇵 FRANÇA NO TOPO 🇨🇵",
-
-	})
-
-end
-
-for _, v in next, Functions do
-
-	task.spawn(v)
-
-end
